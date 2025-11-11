@@ -4,6 +4,12 @@ import tempfile
 import random
 import string
 
+import logging
+from git import Repo, GitCommandError
+
+logger = logging.getLogger(__name__)
+
+
 def generate_random_workspace_name(prefix="workspace-x", length=4):
     """Generate a short random workspace name like workspace-x1234."""
     suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
@@ -26,3 +32,5 @@ def clone_repository(git_url: str) -> str:
         raise RuntimeError(f"Git clone failed: {e}")
     except Exception as ex:
         raise RuntimeError(f"Unexpected error while cloning: {ex}")
+
+

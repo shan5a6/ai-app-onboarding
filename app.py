@@ -3,6 +3,7 @@ from agents.git_clone_agent import run_git_clone_agent
 from agents.dockerfile_agent import run_dockerfile_agent
 from agents.build_publish_agent import run_build_push_agent
 from agents.generate_env_yamls_agent import run_generate_env_yamls_agent
+from agents.git_pr_agent import run_git_pr_agent
 
 import os
 import json
@@ -23,6 +24,7 @@ st.header("1️⃣ Repository Details")
 git_url = st.text_input("🔗 Enter your Git Repository URL", placeholder="https://github.com/org/sample-app.git")
 app_type = st.selectbox("⚙️ Select Application Type", ["Select Type", "NodeJS", "Python", "Java", ".NET"], index=0)
 st.session_state.app_type = app_type
+st.session_state.git_url = git_url
 # -------------------------------
 # Step 2: Clone Button
 # -------------------------------
@@ -130,6 +132,26 @@ if st.button("Generate YAMLs for environments"):
                     st.error(f"Error: {e}")
 
 st.markdown('</div>', unsafe_allow_html=True)
+# ===========================================
+# Step 5: Raise a Pull Request
+# ===========================================
+
+st.header("🚀 AI Onboarding: Create Git Pull Request")
+
+workspace_path = st.session_state.get("workspace_path")
+git_remote = st.session_state.get("git_url")  # dynamically from UI session
+print(f"provide giturl is {git_remote}")
+
+if st.button("Create Pull Request"):
+    if not workspace_path or not git_remote:
+        st.warning("⚠️ Workspace path or Git URL not set.")
+    else:
+        with st.spinner("Creating pull request..."):
+            result = run_git_pr_agent(workspace_path, git_remote)
+            if result.get("success"):
+                st.success(result.get("message"))
+            else:
+                st.error(result.get("message") or result.get("error") or "❌ Unknown failure.")
 
 st.markdown("---")
 st.caption("© 2025 AI DevOps Onboarding | Powered by LangChain + Streamlit")
